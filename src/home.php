@@ -18,7 +18,7 @@ if ($resultado) {
 
 $nome_usuario = null;
 if (isset($_SESSION['usuario_logado']) && $_SESSION['usuario_'] === true){
-    $nome_usuario = $_SESSION['nome_usuario'];
+    $nome_usuario = $_SESSION['usuario_nome'];
 
 } 
 

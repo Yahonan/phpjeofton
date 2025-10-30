@@ -1,47 +1,48 @@
 <?php
 
 require_once 'conexao.php';
-if($_SERVER['REQUEST_METHOD'] == "POST") {
 
-    $nome = $conn->real_escape_string($_POST['nome']);
-    $email = $conn->real_escape_string($_POST['email']);
-    $senha = password_hash($_POST['senha'], PASSWORD_BCRYPT);
+if($_SERVER['REQUEST_METHOD'] == "POST"){
+    $nome = $_POST['nome'];
+    $email = $_POST['email'];
+    $senha_plana = $_POST['senha'];
 
-    $sql_check_email = "SELECT id FROM usuarios WHERE email = $email";
-    $result = $conn->query($sql_check_email);
 
-    if ($result->num_rows > 0) {
+    $sql_check_email = "SELECT id FROM usuarios WHERE email = ?";
+    $stmt_check = $conn->prepare($sql_check_email);
+    $stmt_check->bind_param("s", $email);
+    $stmt_check->execute();
+    $resultado_check = $stmt_check->get_result();
+
+    if ($resultado_check && $resultado_check->num_rows > 0) {
+        $stmt_check->close();
+        $conn->close();
         header("Location: cadastro.php?erro=email_existente");
         exit();
     }
 
-    $senha_hash = password_hash($senha, PASSWORD_BCRYPT);
+    $stmt_check->close();
 
-    $sql = "INSERT INTO usuarios (nome, email, senha) VALUES ('? ', '?', '?')";
-    
-    $stmt = $conn->prepare($sql);
+    $senha_hash = password_hash($senha_plana, PASSWORD_DEFAULT);
 
-    if ($stmt === false){
-        die("Erro na preparação da consulta: " . $conn->error);
+    $sql_insert = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+
+    $stmt_insert = $conn->prepare($sql_insert);
+    if ($stmt_insert === false) {
+        die("Erro na preparação da consulta: " . $conn->error);  
     }
 
+    $stmt_insert->bind_param("sss", $nome, $email, $senha_hash);
 
-    $stmt->bind_param("sss", $nome, $email, $senha_hash);
-
-    if ($stmt->execute()) {
-        $stmt->close();
-        $conn->close();
-        header("Location: login.php?sucesso=cadastro_realizado");
+    if ($stmt_insert->execute()){
+        header("Location: login.php?sucesso=cadastro_ok");
         exit();
     } else {
-        $stmt->close();
-        $conn->close();
-        header("Location: cadastro.php?erro=erro_cadastro");
+        header("Location: cadastro.php?erro=db_error");
         exit();
     }
-
-
-} else{
+ 
+} else {
     header("Location: cadastro.php");
     exit();
 }

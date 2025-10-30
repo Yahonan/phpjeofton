@@ -2,10 +2,8 @@
 // Inicia a sessão
 session_start();
 
-// Se o usuário já está logado, não tem por que estar na página de cadastro.
-// Redireciona para o dashboard.
 if (isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true) {
-    header("Location: dashboard.php");
+    header("Location: home.php");
     exit;
 }
 ?>
@@ -23,14 +21,13 @@ if (isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true) 
 
     <div class="w-full max-w-sm">
         
-        <form action="processar_cadastro.php" method="POST" class="bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+        <form action="processarCadastro.php" method="POST" class="bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
             
             <h1 class="text-3xl font-bold text-center mb-6 text-indigo-400">GAME STORE</h1>
             <h2 class="text-xl text-center mb-8">Crie sua Conta</h2>
 
             <?php
-            // Bloco para exibir erros vindos do 'processar_cadastro.php'
-            // Ex: ?erro=email_existente
+    
             if (isset($_GET['erro'])) {
                 $erroMsg = "Ocorreu um erro. Tente novamente.";
                 if ($_GET['erro'] == 'email_existente') {
@@ -74,7 +71,7 @@ if (isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true) 
                        id="senha" 
                        name="senha" 
                        type="password" 
-                       placeholder="Mínimo 6 caracteres" 
+                       placeholder="Mínimo 5 caracteres" 
                        required>
             </div>
 
